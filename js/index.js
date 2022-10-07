@@ -17,7 +17,7 @@ do {
 
     } while (operador != '+' && operador != '-' && operador != '*' && operador != '/');
 
-    let operandos;
+    let operandos; 
     let operando1;
     let operando2;
 
