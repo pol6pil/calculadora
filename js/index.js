@@ -15,7 +15,7 @@ do {
             alert('Operador invalido')
         }
 
-    } while (operador != '+' && operador != '-' && operador != '*' && operador != '/' && operador == null && operador == undefined);
+    } while (operador != '+' && operador != '-' && operador != '*' && operador != '/');
 
     let operandos;
     let operando1;
