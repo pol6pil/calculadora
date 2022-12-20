@@ -4,26 +4,26 @@
 window.alert('Bienvenido')
 
 // Creamos un objeto calculadora que tiene una propiedad lastResult que por defecto tendra de valor 0 y 4 metodos para realizar las operaciones
-const Calculadora = {
-  lastResult: 0,
+class Calculadora {
+  lastResult = 0
 
   sumar (operando1, operando2) {
     // Almacenamos el resultado en la propiedad lastResult
     this.lastResult = operando1 + operando2
     return operando1 + operando2
-  },
+  }
 
   restar (operando1, operando2) {
     // Almacenamos el resultado en la propiedad lastResult
     this.lastResult = operando1 - operando2
     return operando1 - operando2
-  },
+  }
 
   multiplicar (operando1, operando2) {
     // Almacenamos el resultado en la propiedad lastResult
     this.lastResult = operando1 * operando2
     return operando1 * operando2
-  },
+  }
 
   dividir (operando1, operando2) {
     // Si el segundo operador es 0 mostramos que no se puede dividir y como ultimo resultado guardamos 0
@@ -35,7 +35,57 @@ const Calculadora = {
       return 'No se puede dividir entre 0'
     }
   }
+}
 
+const calculadora = new Calculadora()
+
+class CalculatorError extends Error {
+  constructor (message) {
+    super(message)
+    this.name = this.constructor.name
+  }
+}
+
+class OperatorError extends CalculatorError {
+  constructor (message) {
+    super(message)
+    this.name = this.constructor.name
+  }
+}
+
+class InvalidOpertatorError extends OperatorError {
+  constructor (message) {
+    super(message)
+    this.name = this.constructor.name
+  }
+}
+
+class NullOpertatorError extends OperatorError {
+  constructor (message) {
+    super(message)
+    this.name = this.constructor.name
+  }
+}
+
+class OperarseError extends CalculatorError {
+  constructor (message) {
+    super(message)
+    this.name = this.constructor.name
+  }
+}
+
+class InvalidOperarseError extends OperarseError {
+  constructor (message) {
+    super(message)
+    this.name = this.constructor.name
+  }
+}
+
+class NullOperarseError extends OperarseError {
+  constructor (message) {
+    super(message)
+    this.name = this.constructor.name
+  }
 }
 
 do {
@@ -52,11 +102,13 @@ do {
     operando1 = operando1.trim()
 
     if (operando1 === 'R') {
-      operando1 = Calculadora.lastResult
+      operando1 = calculadora.lastResult
     } else {
       operando1 = Number(operando1)
     }
-
+    if (!(isFinite(operando1))) {
+      throw new InvalidOperarseError('Operando invalido!')
+    }
     return operando1
   }
 
@@ -65,9 +117,12 @@ do {
     operando2 = operando2.trim()
 
     if (operando2 === 'R') {
-      operando2 = Calculadora.lastResult
+      operando2 = calculadora.lastResult
     } else {
       operando2 = Number(operando2)
+    }
+    if (!(isFinite(operando2))) {
+      throw new InvalidOperarseError('Operando invalido!')
     }
 
     return operando2
@@ -76,11 +131,10 @@ do {
   const pedirOperandos = function () {
     operandos = window.prompt('Inserte los dos operandos separados por un espacio')
     if (operandos === null) {
-      return null
+      throw new NullOperarseError('NULL')
     }
-
     if (!operandos) {
-      operandos = 'invalido'
+      throw new InvalidOperarseError('Operando invalido!')
     }
     operandos = operandos.trim()
 
@@ -88,28 +142,35 @@ do {
   }
 
   do {
-    operandos = pedirOperandos()
+    try {
+      operandos = pedirOperandos()
 
-    operando1 = sacarOperando1(operandos)
+      operando1 = sacarOperando1(operandos)
 
-    operando2 = sacarOperando2(operandos)
-
-    if (!isFinite(operando1) || !isFinite(operando2)) {
-      window.alert('Operandos invalidos')
+      operando2 = sacarOperando2(operandos)
+    } catch (err) {
+      if (!(err instanceof NullOperarseError)) {
+        window.alert(err.message)
+      } else {
+        break
+      }
     }
   } while (!isFinite(operando1) || !isFinite(operando2))
 
+  if (operandos === null) {
+    break
+  }
   switch (operador) {
-    case '+': window.alert(Calculadora.sumar(operando1, operando2))
+    case '+': window.alert(calculadora.sumar(operando1, operando2))
       break
 
-    case '-': window.alert(Calculadora.restar(operando1, operando2))
+    case '-': window.alert(calculadora.restar(operando1, operando2))
       break
 
-    case '*': window.alert(Calculadora.multiplicar(operando1, operando2))
+    case '*': window.alert(calculadora.multiplicar(operando1, operando2))
       break
 
-    case '/': window.alert(Calculadora.dividir(operando1, operando2))
+    case '/': window.alert(calculadora.dividir(operando1, operando2))
       break
   }
 } while (window.confirm('Quiere realizar otra operacion?'))
@@ -117,18 +178,21 @@ do {
 function pedirOperador () {
   let operador
   do {
-    operador = window.prompt('Inserte el operador deseado (+, -, * o /)')
-    if (operador === null) {
-      break
-    }
-
-    if (!operador) {
-      operador = 'invalido'
-    }
-    operador = operador.trim()
-
-    if (operador !== '+' && operador !== '-' && operador !== '*' && operador !== '/') {
-      window.alert('Operador invalido')
+    try {
+      operador = window.prompt('Inserte el operador deseado (+, -, * o /)')
+      if (operador === null) {
+        throw new NullOpertatorError()
+      }
+      operador = operador.trim()
+      if (operador !== '+' && operador !== '-' && operador !== '*' && operador !== '/') {
+        throw new InvalidOpertatorError('Operador Invalido')
+      }
+    } catch (error) {
+      if (error instanceof NullOpertatorError) {
+        break
+      } else if (error instanceof InvalidOpertatorError) {
+        window.alert(error.message)
+      }
     }
   } while (operador !== '+' && operador !== '-' && operador !== '*' && operador !== '/')
 
